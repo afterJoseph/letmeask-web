@@ -6,6 +6,8 @@ import { Question } from "../components/Question";
 import { RoomCode } from "../components/RoomCode";
 import { useRoom } from "../hooks/useRoom";
 import { database } from "../services/firebase";
+import cehckImg from "../assets/images/check.svg";
+import answerImg from "../assets/images/answer.svg";
 import deleteImg from "../assets/images/delete.svg";
 import "../styles/room.scss";
 
@@ -43,6 +45,18 @@ export function AdminRoom() {
     }
   }
 
+  async function handleCheckQuestionAsAnswered(questionId: string) {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isAnswered: true,
+    });
+  }
+
+  async function handleHighlightQuestion(questionId: string) {
+    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+      isHighlighted: true,
+    });
+  }
+
   async function handleDeleteQuestion(questionId: string) {
     if (window.confirm("Tem a certeza que quer excluir a perguntar?")) {
       await database.ref(`rooms/${roomId}/questions/${questionId}`).remove();
@@ -75,7 +89,25 @@ export function AdminRoom() {
               content={question.content}
               author={question.author}
               key={question.id}
+              isAnswered={question.isAnswered}
+              isHighlighted={question.isHighlighted}
             >
+              {!question.isAnswered && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                  >
+                    <img src={cehckImg} alt="Check Question As Answered" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleHighlightQuestion(question.id)}
+                  >
+                    <img src={answerImg} alt="Answer Question" />
+                  </button>
+                </>
+              )}
               <button
                 type="button"
                 onClick={() => handleDeleteQuestion(question.id)}
